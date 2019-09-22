@@ -1,21 +1,83 @@
 const axios = require('axios');
-const mtg = require('mtgsdk');
+const Card = require('../model/Card');
+const fs = require('fs');
 
 module.exports = {
+    
+    //procura cards na base
     async index(req, res){
-            // partial name match
-        let card = req.body.card;
-           await mtg.card.where({name: `${card}`})
-            .then(results => {
-            console.log('chegou');
-            return res.json(results);
+      const consult = req.body.card;
+
+      const getCard = await Card.find(consult);
+
+      return res.json(getCard);
+    },
+    async store(req, res){
+        const cardName = req.body.card;
+
+        //Busca se o card já está na base
+        const cardExists = await Card.find({
+            $or:[
+                {name: {$regex: `.*${cardName}.*`}},
+                // {'foreignNames.name': {$regex: `.*${cardName}.*`}}
+
+            ]
+        }, (err, data)=>{
+            if(data){
+            return data;
+            }else{
+                return `erro no db ${err}`;
+            }
         });
-        // const result = await axios.get(`http://api.magicthegathering.io/v1/cards?name=${card}`)
-        // .then((response)=>{
-        //     console.log('chegou');
-        //     return response.data;
-        // })
-        // .catch((error)=>{return error});
-        // return res.json(result);
+
+        //Se o card não existe, cria
+        if(cardExists == false){
+            console.log("tem bosta nenhuma, tem que criar");
+            const response = await axios.get(`http://api.magicthegathering.io/v1/cards?name=${cardName}`);
+            const cards = response.data.cards; 
+            
+                //Valida se o nome do card existe na base da Wizards e salva
+                if(cards == false){
+                return res.json("Card does not exists")
+                }else{
+                    for await (card of cards){
+                        Card.create({
+                        name: [card.name, card.foreignNames.name],
+                        cmc:card.cmc,
+                        names: card.names,
+                        manaCost: card.manaCost,
+                        colors:card.colors,
+                        colorIdentity:card.colorIdentity,
+                        type:card.type,
+                        supertypes:card.supertypes,
+                        types:card.types,
+                        subtypes:card.subtypes,
+                        rarity:card.rarity,
+                        setAcronym:card.set,
+                        setName:card.setName,
+                        text:card.text,
+                        flavor:card.flavor,
+                        artist:card.artist,
+                        number:card.number,
+                        power:card.power,
+                        toughness:card.toughness,
+                        layout:card.layout,
+                        multiverseid:card.multiverseid,
+                        imageUrl:card.imageUrl,
+                        rulings:[card.rulings],
+                        foreignNames:[card.foreignNames],
+                        printings:card.printings,
+                        originalText:card.originalText,
+                        originalType:card.originalType,
+                        legalities:[card.legalities],
+                        id:card.id
+                        });
+                        console.log("criado");
+                    }
+                }
+                return res.json(cards); 
+        }else{
+            return res.json(cardExists);
+        }
     }
 }

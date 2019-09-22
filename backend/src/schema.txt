@@ -1,0 +1,93 @@
+name:{
+            type: String
+        },
+        names: {
+            _id: false,
+            type: Array,
+        },
+        manaCost: {
+            type: String
+        },
+        cmc:{
+            type: String
+        },
+        colors:{
+            _id: false,
+            type: Array
+        },
+        colorIdentity:{
+            _id: false,
+            type: Array
+        },
+        type:{
+            _id: false,
+            type: String
+        },
+        supertypes:{
+            _id: false,
+            type: Array
+        },
+        types:{
+            _id: false,
+            type: Array
+        },
+        subtypes:{
+            _id: false,
+            type: Array
+        },
+        rarity:{
+            
+            type: String
+        },
+        set:{
+            type: String
+        },
+        setName:{
+            type: String
+        },
+        text:{
+            type: String
+        },
+        flavor:{
+            type: String
+        },
+        artist:{
+            type: String
+        },
+        number:{
+            type: String
+        },
+        power:{
+            type: String 
+        },
+        toughness:{
+            type: String 
+        },
+        layout:{
+            type: String 
+        },
+        multiverseid:{
+            type: String
+        },
+        imageUrl:{
+            type: String 
+        },
+
+        foreignNames:{
+            _id: false,
+            type: Array
+        },
+        printings:{
+            _id: false,
+            type: Array
+        },
+        originalText:{
+            type: String
+        },
+        originalType:{
+            type: String
+        },
+
+        id:{
+            type: String 
+        }

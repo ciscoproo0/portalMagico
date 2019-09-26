@@ -1,10 +1,10 @@
 const {Schema, model} = require('mongoose');
 
 const CardSchema = new Schema({
-    name:[{
-        type: Array,
+    name:{
+        type: String,
         lowercase: true
-    }],
+    },
     names:[{
         _id: false,
         type: String,

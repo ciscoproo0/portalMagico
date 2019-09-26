@@ -1,8 +1,17 @@
 
 <div class="container-busca">
-    <label for="busca">Procure por Nome: </label><input id="busca" type="text">
+    <label for="busca">Procure por Nome: </label><input id="busca" type="text" [(ngModel)]="card"  (keydown)="onKeydown($event)">
 </div>
 
-<div class="container-resultado">
-    
+<div class="container-cartas">
+    <ul *ngIf="cards">
+        <li *ngFor="let card of cards">
+            <div class="container-img">
+                <img [src]="card.imageUrl" alt="card" onError="this.src='../assets/StandardImg.jpg'">
+            </div>
+            <p class="name">{{ card.name }}</p>
+            <p class="setName">{{ card.setName }}</p>
+            <!-- <p class="Url">{{card.imageUrl}}</p> -->
+        </li>
+    </ul>
 </div>

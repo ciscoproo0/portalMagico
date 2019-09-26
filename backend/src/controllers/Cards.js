@@ -6,9 +6,22 @@ module.exports = {
     
     //procura cards na base
     async index(req, res){
-      const consult = req.body.card;
+    //   const consult = req.body.card;
+      const consult = 'Intet';
 
-      const getCard = await Card.find(consult);
+      const getCard = await Card.find({
+        $or:[
+            {name: {$regex: `.*${consult}.*`}},
+            // {'foreignNames.name': {$regex: `.*${cardName}.*`}}
+
+        ]
+    }, (err, data)=>{
+        if(data){
+        return data;
+        }else{
+            return `erro no db ${err}`;
+        }
+      });
 
       return res.json(getCard);
     },
@@ -32,9 +45,19 @@ module.exports = {
 
         //Se o card não existe, cria
         if(cardExists == false){
-            console.log("tem bosta nenhuma, tem que criar");
+            console.log("Card inexistente na base");
+
             const response = await axios.get(`http://api.magicthegathering.io/v1/cards?name=${cardName}`);
+            
             const cards = response.data.cards; 
+            const countPages = Math.ceil(response.headers['total-count'] /100);
+                //se a buxca trouxer mais que 100 cards, é necessário paginar
+                if(countPages > 1){
+                    for (let i=2; i<=countPages; i++){
+                        const res = await axios.get(`https://api.magicthegathering.io/v1/cards?name=${cardName}&page=${i}`)
+                            cards.push(res.data.cards);
+                    }
+                }
             
                 //Valida se o nome do card existe na base da Wizards e salva
                 if(cards == false){
@@ -42,7 +65,7 @@ module.exports = {
                 }else{
                     for await (card of cards){
                         Card.create({
-                        name: [card.name, card.foreignNames.name],
+                        name: card.name,
                         cmc:card.cmc,
                         names: card.names,
                         manaCost: card.manaCost,
